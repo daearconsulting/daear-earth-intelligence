@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "daear-toolkit"
+version = "0.1.0"
+description = "Shared Earth observation, indicator, cube, governance, and viz utilities for the Daear Consulting demo portfolio"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "pandas",
+    "xarray",
+    "matplotlib",
+]
+
+[project.optional-dependencies]
+live = ["earthaccess", "pystac-client", "rioxarray", "requests"]
+dev = ["pytest"]
+
+[tool.setuptools.packages.find]
+include = ["daear_toolkit*"]
