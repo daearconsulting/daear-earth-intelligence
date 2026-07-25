@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-live = ["earthaccess", "pystac-client", "rioxarray", "requests"]
+live = ["pystac-client", "planetary-computer", "stackstac", "rioxarray", "requests"]
 dev = ["pytest"]
 
 [tool.setuptools.packages.find]

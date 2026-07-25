@@ -2,14 +2,17 @@
 Uniform data access layer.
 
 Each `get_*` function has the real (network-backed) implementation and a
-`synthetic=True` fallback. The synthetic path is what runs in this build 
-see the top-level README for why but the function signatures, coordinate
+`synthetic=True` fallback. The synthetic path is what runs in this build —
+see the top-level README for why — but the function signatures, coordinate
 handling, and output shapes match what the live path returns, so downstream
 code (indicators, cube-building, dashboards) never has to know which mode
 produced the array.
 
-Real-data dependencies (not installed in this sandbox): earthaccess,
-pystac-client, rioxarray, requests (for SSURGO/SoilGrids REST endpoints).
+Live-data dependencies (install with `pip install 'daear-toolkit[live]'`):
+pystac-client, planetary-computer, stackstac, rioxarray, requests. See
+`daear_toolkit._live` for the implementations and a per-source confidence
+note (some endpoints, like MTBS, don't have a clean stable API and need a
+URL you supply; others, like Planetary Computer and FIRMS, are solid).
 """
 
 from __future__ import annotations
@@ -17,8 +20,12 @@ from __future__ import annotations
 import numpy as np
 import xarray as xr
 
+from . import _live
 
+
+# ---------------------------------------------------------------------------
 # Shared grid helper
+# ---------------------------------------------------------------------------
 
 def _grid(bbox: tuple, resolution_deg: float = 0.002):
     """Build a lon/lat coordinate grid for a bbox at ~200m resolution by default."""
@@ -51,7 +58,9 @@ def _smooth_random_field(shape: tuple, seed: int, smoothness: int = 9) -> np.nda
     return out
 
 
-# Sentinel-2/Landsat surface reflectance
+# ---------------------------------------------------------------------------
+# Sentinel-2 / Landsat surface reflectance
+# ---------------------------------------------------------------------------
 
 def get_optical_scene(
     bbox: tuple,
@@ -64,20 +73,16 @@ def get_optical_scene(
     Return a surface-reflectance scene with red, nir, and swir16 bands
     (enough to compute NDVI and NBR) over `bbox` near `date`.
 
-    Live path (synthetic=False): queries Microsoft Planetary Computer's STAC
-    API for `source` ("sentinel-2" or "landsat-c2-l2"), reads the scene with
-    rioxarray, clips to bbox. Requires network access to
-    planetarycomputer.microsoft.com and a SAS token.
+    Live path (synthetic=False): real Sentinel-2 L2A via Microsoft Planetary
+    Computer's STAC API -- `daear_toolkit._live.sentinel2_scene`. No
+    credentials needed for read access. HIGH confidence (see _live.py
+    module docstring).
 
     Demo path (synthetic=True): generates structurally realistic bands with
     the same dims/coords a real scene would have.
     """
     if not synthetic:
-        raise NotImplementedError(
-            "Live retrieval requires pystac-client + rioxarray and network "
-            "access to Planetary Computer, not available in this build. "
-            "Call with synthetic=True, or see README 'Going live'."
-        )
+        return _live.sentinel2_scene(bbox, date)
 
     lons, lats = _grid(bbox)
     shape = (len(lats), len(lons))
@@ -102,31 +107,44 @@ def get_optical_scene(
     return ds
 
 
+# ---------------------------------------------------------------------------
 # Fire products: MTBS burn severity, FIRMS active fire detections
+# ---------------------------------------------------------------------------
 
 def get_burn_severity(bbox: tuple, fire_year: int, synthetic: bool = True, seed: int = 1) -> xr.DataArray:
     """
     Return a dNBR-like burn severity raster (0 = unburned, 1 = high severity)
     over `bbox` for the fire in `fire_year`.
 
-    Live path: MTBS (Monitoring Trends in Burn Severity) direct download
-    (mtbs.gov), reprojected/clipped. No auth required, but domain not
-    reachable from this sandbox.
+    Live path: MEDIUM confidence -- MTBS doesn't have a clean queryable API,
+    so this raises with instructions rather than guessing a URL. Two ways
+    to get real data:
+
+    1. `daear_toolkit._live.mtbs_burn_severity_from_direct_download(url, bbox)`
+       -- find "Cameron Peak" at https://mtbs.gov/direct-download, copy the
+       dNBR/severity GeoTIFF link, pass it as `url`.
+    2. `daear_toolkit._live.burn_severity_from_sentinel2(bbox, pre_date, post_date)`
+       -- no MTBS dependency at all; computes real dNBR from two real
+       Sentinel-2 scenes. HIGH confidence, since it only depends on the
+       Planetary Computer path.
     """
     if not synthetic:
         raise NotImplementedError(
-            "Live retrieval requires network access to mtbs.gov. "
-            "Call with synthetic=True, or see README 'Going live'."
+            "get_burn_severity has no single live call -- MTBS doesn't expose "
+            "a stable queryable API. Use one of:\n"
+            "  daear_toolkit._live.mtbs_burn_severity_from_direct_download(url, bbox)\n"
+            "  daear_toolkit._live.burn_severity_from_sentinel2(bbox, pre_date, post_date)\n"
+            "See the docstring above and _live.py's module docstring for details."
         )
 
     lons, lats = _grid(bbox)
     shape = (len(lats), len(lons))
     # Burn scar concentrated in the upper (northwest) part of the bbox,
-    # tapering toward the valley floor which mimics the real Cameron Peak
+    # tapering toward the valley floor -- mimics the real Cameron Peak
     # perimeter's relationship to the Poudre canyon.
     field = _smooth_random_field(shape, seed=seed, smoothness=15)
     lat_grid, lon_grid = np.meshgrid(lats, lons, indexing="ij")
-    lat_norm = (lat_grid - lat_grid.min())/(lat_grid.max() - lat_grid.min())
+    lat_norm = (lat_grid - lat_grid.min()) / (lat_grid.max() - lat_grid.min())
     severity = np.clip(field * (0.4 + 0.6 * lat_norm) - 0.15, 0, 1)
 
     da = xr.DataArray(
@@ -144,14 +162,12 @@ def get_fire_detections(bbox: tuple, date_range: tuple, synthetic: bool = True, 
     Return FIRMS-style active-fire point detections (lon, lat, confidence,
     acq_date) within bbox/date_range.
 
-    Live path: NASA FIRMS API (firms.modaps.eosdis.nasa.gov), requires a
-    MAP_KEY. Domain not reachable from this sandbox.
+    Live path: real NASA FIRMS active-fire detections. HIGH confidence.
+    Requires a free MAP_KEY (https://firms.modaps.eosdis.nasa.gov/api/map_key/)
+    set as the FIRMS_MAP_KEY environment variable.
     """
     if not synthetic:
-        raise NotImplementedError(
-            "Live retrieval requires a FIRMS MAP_KEY and network access to "
-            "firms.modaps.eosdis.nasa.gov. Call with synthetic=True."
-        )
+        return _live.firms_fire_detections(bbox, date_range[0], date_range[1])
 
     rng = np.random.default_rng(seed)
     min_lon, min_lat, max_lon, max_lat = bbox
@@ -167,20 +183,19 @@ def get_fire_detections(bbox: tuple, date_range: tuple, synthetic: bool = True, 
     )
 
 
+# ---------------------------------------------------------------------------
 # Terrain
+# ---------------------------------------------------------------------------
 
 def get_terrain(bbox: tuple, synthetic: bool = True, seed: int = 3) -> xr.Dataset:
     """
     Return an elevation raster plus derived slope over bbox.
 
-    Live path: USGS 3DEP via py3dep/The National Map, or Planetary
-    Computer's `cop-dem-glo30` collection. Domain not reachable here.
+    Live path: real Copernicus 30m DEM via Planetary Computer's
+    `cop-dem-glo30` collection. HIGH confidence, no credentials needed.
     """
     if not synthetic:
-        raise NotImplementedError(
-            "Live retrieval requires network access to USGS 3DEP or "
-            "Planetary Computer. Call with synthetic=True."
-        )
+        return _live.copernicus_dem(bbox)
 
     lons, lats = _grid(bbox)
     shape = (len(lats), len(lons))
@@ -204,20 +219,29 @@ def get_terrain(bbox: tuple, synthetic: bool = True, seed: int = 3) -> xr.Datase
     return ds
 
 
+# ---------------------------------------------------------------------------
 # Soil
+# ---------------------------------------------------------------------------
 
 def get_soil_properties(bbox: tuple, synthetic: bool = True, seed: int = 4) -> xr.Dataset:
     """
     Return soil organic matter (%), sand fraction (%), and hydrologic soil
     group proxy (0-1, higher = more runoff-prone) over bbox.
 
-    Live path: USDA SSURGO via Soil Data Access REST API, or SoilGrids WCS.
-    Domains not reachable here.
+    Live path: MEDIUM confidence -- real SSURGO data via USDA's Soil Data
+    Access (SDA). Note the shape difference: SSURGO is polygon/map-unit
+    data, not a regular grid, so the live path returns a per-map-unit
+    DataFrame (`daear_toolkit._live.ssurgo_soil_properties`), not an
+    xr.Dataset on this function's synthetic grid. Rasterizing that table
+    onto the toolkit's lat/lon grid (e.g. with geopandas + rasterio) is a
+    follow-up step this function doesn't do for you.
     """
     if not synthetic:
         raise NotImplementedError(
-            "Live retrieval requires network access to SSURGO Soil Data "
-            "Access or SoilGrids. Call with synthetic=True."
+            "get_soil_properties' live path returns a different shape than "
+            "its synthetic path (SSURGO is map-unit polygons, not a raster "
+            "grid). Call daear_toolkit._live.ssurgo_soil_properties(bbox) "
+            "directly and rasterize the result onto your grid of choice."
         )
 
     lons, lats = _grid(bbox)

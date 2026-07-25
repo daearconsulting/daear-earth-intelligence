@@ -17,21 +17,31 @@ one platform instead of four disconnected notebooks.
 
 ## Data access: honest status
 
-This toolkit is built to call real Earth observation sources — `earthaccess`
-(NASA), `pystac-client` (Microsoft Planetary Computer / Element84), and USDA
-SSURGO web services — through `data_access.py`. **In this build**, those calls
-are implemented but the demo notebooks run in `synthetic=True` mode, because
-the sandbox this was built in does not have network access to Earthdata,
-Planetary Computer, or Copernicus endpoints.
+**The demo notebooks in this repo run in `synthetic=True` mode by default**,
+because the sandbox this portfolio was built in only has network access to
+package registries and GitHub — not Earthdata, Planetary Computer, MTBS,
+FIRMS, or SSURGO. The synthetic generator (`data_access._smooth_random_field`
+and friends) produces structurally realistic rasters — correct shape,
+coordinate reference, plausible value ranges and spatial autocorrelation —
+seeded so results are reproducible. Every downstream calculation (NDVI,
+dNBR, erosion indicators, composite indices) runs on that synthetic data
+using the *same* code path that would run on real imagery.
 
-The synthetic generator (`data_access.synthetic_scene`) produces
-structurally realistic rasters with correct shape, coordinate reference,
-plausible value ranges and spatial autocorrelation seeded so results are
-reproducible. Every downstream calculation (NDVI, dNBR, erosion indicators,
-composite indices) runs on that synthetic data using the *same* code path
-that would run on real imagery. Swapping `synthetic=False` and supplying
-credentials is the only change needed to point this at live data — see
-"Going live" below.
+**`synthetic=False` is now a real implementation, not a stub** — see
+`daear_toolkit/_live.py`. If you're running this somewhere with open network
+access (your own machine, Colab, etc.), it will actually pull real data:
+
+| Source | Function | Confidence |
+|---|---|---|
+| Sentinel-2 (via Planetary Computer) | `_live.sentinel2_scene` | High — stable public API, no credentials needed |
+| Copernicus 30m DEM (via Planetary Computer) | `_live.copernicus_dem` | High |
+| FIRMS active-fire detections | `_live.firms_fire_detections` | High — needs a free `FIRMS_MAP_KEY` |
+| Burn severity, no-MTBS route | `_live.burn_severity_from_sentinel2` | High — real dNBR from two real Sentinel-2 scenes |
+| MTBS burn severity, direct download | `_live.mtbs_burn_severity_from_direct_download` | Medium — you supply the GeoTIFF URL; MTBS has no clean queryable API |
+| SSURGO soil properties | `_live.ssurgo_soil_properties` | Medium — endpoint/query verified against SDA docs as of this build, but SDA's exact SQL function names have shifted before; returns a per-map-unit table, not a grid |
+
+See `_live.py`'s module docstring for the full reasoning behind each
+confidence rating before relying on this under deadline pressure.
 
 ## Demo region
 
@@ -53,10 +63,16 @@ exit onto the Front Range.
 
 ## Going live
 
-To point this at real data:
-1. `pip install earthaccess pystac-client rioxarray` (not installed in this build)
-2. Set `EARTHDATA_USERNAME`/`EARTHDATA_TOKEN` (or Planetary Computer SAS token) as environment variables
-3. Call any `data_access.get_*` function with `synthetic=False`
+1. `pip install 'daear-toolkit[live]'` (or from this repo: `pip install -e ".[live]"`)
+2. Get a free FIRMS `MAP_KEY` (https://firms.modaps.eosdis.nasa.gov/api/map_key/) and set it: `export FIRMS_MAP_KEY=...`
+   — Planetary Computer needs no credentials for read access.
+3. Call `data_access.get_optical_scene(..., synthetic=False)` or
+   `data_access.get_terrain(..., synthetic=False)` directly; for burn
+   severity and soil, call the `daear_toolkit._live` functions directly
+   (see table above — their live paths don't map 1:1 onto the synthetic
+   function signatures, for reasons explained inline).
+4. Not run or verified from this sandbox (no network access here) — test
+   against a small bbox first before pointing this at a full pipeline run.
 
 ## Install
 

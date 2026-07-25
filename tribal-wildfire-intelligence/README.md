@@ -2,7 +2,7 @@
 
 The data-sovereignty differentiator repo. Where the other repos *describe*
 Daear's governance commitments, this one demonstrates them running against
-sample data where access is actually gated by governance metadata, not just
+sample data — access is actually gated by governance metadata, not just
 documented in a policy paragraph.
 
 ## Module plan
@@ -29,7 +29,7 @@ restricted layer being safely released only after aggregation.
 data/
   tribal_restricted/   # would hold anything requiring COMMUNITY or
                         # RESTRICTED-tier access in a real deployment.
-                        # Empty here -this repo demonstrates the *access
+                        # Empty here — this repo demonstrates the *access
                         # control mechanism*, not real restricted data.
 ```
 

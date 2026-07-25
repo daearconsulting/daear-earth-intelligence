@@ -23,7 +23,7 @@ from enum import Enum
 class AccessTier(Enum):
     PUBLIC = "public"           # open, no restrictions
     COMMUNITY = "community"     # restricted to designated Tribal/community accounts
-    RESTRICTED = "restricted"   # sensitive locations (ex. cultural sites) aggregate-only release
+    RESTRICTED = "restricted"   # sensitive locations (e.g. cultural sites) -- aggregate-only release
 
 
 @dataclass
@@ -32,10 +32,10 @@ class GovernanceRecord:
     title: str
     steward: str                       # who holds authority to control this data
     access_tier: AccessTier
-    care_notes: str = ""               # how Collective Benefit/Authority/Responsibility/Ethics apply
+    care_notes: str = ""               # how Collective Benefit / Authority / Responsibility / Ethics apply
     ocap_notes: str = ""               # ownership/control/access/possession specifics
     created: date = field(default_factory=date.today)
-    local_contexts_notice: str | None = None  # ex. "TK Label: TK Attribution"
+    local_contexts_notice: str | None = None  # e.g. "TK Label: TK Attribution"
 
 
 class AccessDeniedError(PermissionError):

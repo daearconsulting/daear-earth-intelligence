@@ -1,5 +1,5 @@
 """
-Data cube utilities the same xarray/zarr cube pattern used in the
+Data cube utilities -- the same xarray/zarr cube pattern used in the
 NIFA-funded Integrated Data Cube contract with Oglala Lakota College,
 generalized for reuse across the demo portfolio.
 """
@@ -38,7 +38,7 @@ def to_zarr(ds: xr.Dataset, path: str):
     """
     Persist a cube to Zarr for reuse across repos/notebooks without
     recomputing. Real deployments would point `path` at cloud object storage
-    (ex. s3://daear-data-cubes/...); this demo writes locally.
+    (e.g. s3://daear-data-cubes/...); this demo writes locally.
     """
     ds.to_zarr(path, mode="w")
 

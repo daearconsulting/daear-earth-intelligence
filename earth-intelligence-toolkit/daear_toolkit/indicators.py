@@ -2,7 +2,7 @@
 Indicator calculations shared across all downstream repos.
 
 These are real formulas (NDVI, NBR/dNBR, a simple erosion-susceptibility
-composite) operating on whatever DataArrays data_access.py hands back 
+composite) operating on whatever DataArrays data_access.py hands back --
 synthetic in this build, real imagery once network access is available.
 Nothing about this module changes when the input source changes.
 """
@@ -84,10 +84,10 @@ def erosion_susceptibility(
     Composite post-fire erosion susceptibility index (0-1).
 
     This is a simplified, transparent stand-in for the logic behind
-    USFS BAER post-fire erosion modeling (ex. ERMiT/Disturbed WEPP):
-    steeper slopes + higher burn severity and higher inherent runoff
+    USFS BAER post-fire erosion modeling (e.g. ERMiT/Disturbed WEPP):
+    steeper slopes + higher burn severity + higher inherent runoff
     potential -> higher erosion susceptibility. Weights are illustrative,
-    not calibrated: flagged clearly for anyone using this beyond a demo.
+    not calibrated -- flagged clearly for anyone using this beyond a demo.
     """
     slope_norm = (slope_deg - slope_deg.min()) / (slope_deg.max() - slope_deg.min() + 1e-9)
     out = 0.4 * slope_norm + 0.4 * burn_severity + 0.2 * runoff_potential
@@ -128,7 +128,7 @@ def watershed_resilience_index(
     vegetation_recovery_da: xr.DataArray | None = None,
 ) -> xr.DataArray:
     """
-    Composite index (0-1, higher = more resilient/lower risk) combining
+    Composite index (0-1, higher = more resilient / lower risk) combining
     erosion susceptibility and soil vulnerability, optionally offset by
     vegetation recovery. This is the indicator climate-resilience-indicators
     aggregates across regions.
