@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Data sovereignty governance scaffolding.
 
@@ -13,8 +15,6 @@ Control, Responsibility, Ethics), and FAIR (Findable, Accessible,
 Interoperable, Reusable) as complementary, not competing, frameworks.
 """
 
-from __future__ import annotations
-
 from dataclasses import dataclass, field
 from datetime import date
 from enum import Enum
@@ -23,7 +23,7 @@ from enum import Enum
 class AccessTier(Enum):
     PUBLIC = "public"           # open, no restrictions
     COMMUNITY = "community"     # restricted to designated Tribal/community accounts
-    RESTRICTED = "restricted"   # sensitive locations (e.g. cultural sites) -- aggregate-only release
+    RESTRICTED = "restricted"   # sensitive locations (ex. cultural sites) aggregate-only release
 
 
 @dataclass
@@ -32,7 +32,7 @@ class GovernanceRecord:
     title: str
     steward: str                       # who holds authority to control this data
     access_tier: AccessTier
-    care_notes: str = ""               # how Collective Benefit / Authority / Responsibility / Ethics apply
+    care_notes: str = ""               # how Collective Benefit/Authority/Responsibility/Ethics apply
     ocap_notes: str = ""               # ownership/control/access/possession specifics
     created: date = field(default_factory=date.today)
     local_contexts_notice: str | None = None  # e.g. "TK Label: TK Attribution"
@@ -57,7 +57,7 @@ def gated_release(record: GovernanceRecord, requester_tier: AccessTier, payload)
     Return `payload` only if the requester's tier satisfies the record's
     access tier; otherwise raise. This is the function
     tribal-wildfire-intelligence calls before handing back any
-    culturally-sensitive layer (e.g. site-level fire history near named
+    culturally-sensitive layer (ex. site-level fire history near named
     locations), demonstrating enforcement rather than just describing it.
     """
     if not check_access(record, requester_tier):

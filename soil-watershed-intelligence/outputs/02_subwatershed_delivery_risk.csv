@@ -1,0 +1,25 @@
+huc12,name,area_cells,pct_high_severity,mean_connectivity,mean_delivery_risk
+101900070103,Pennock Creek,461,0.166,-1.381,0.232
+101900070101,Beaver Creek,1535,0.881,-1.59,0.218
+101900070205,Willow Creek-Cache la Poudre River,1621,0.964,-1.509,0.214
+101800100101,Rawah Creek-Laramie River,643,0.0,-1.656,0.19
+101900070206,Sheep Creek,1523,0.199,-1.816,0.188
+101900070105,Pendergrass Creek-South Fork Cache la Poudre River,1874,0.159,-1.709,0.187
+101900070204,Joe Wright Creek,729,0.023,-1.711,0.185
+101900070209,Bennett Creek,998,0.275,-1.632,0.183
+101900070102,Headwaters South Fork Cache la Poudre River,350,0.089,-1.736,0.181
+101900070210,Sevenmile Creek-Cache la Poudre River,2023,0.0,-1.593,0.166
+101900060301,Upper Buckhorn Creek,733,0.053,-1.784,0.164
+101900070702,Rabbit Creek,282,0.0,-1.57,0.163
+101900070104,Little Beaver Creek,1262,0.053,-1.848,0.162
+101900070208,Black Hollow-Cache la Poudre River,4111,0.0,-1.695,0.16
+101900070303,Skin Gulch-Cache la Poudre River,103,0.0,-1.815,0.158
+101900070601,South Fork Lone Pine Creek,1768,0.0,-1.708,0.148
+101900070301,Elkhorn Creek,2194,0.0,-1.719,0.144
+101900070207,Roaring Creek,1087,0.0,-1.885,0.141
+101900070504,Bull Creek-North Fork Cache La Poudre River,217,0.0,-1.919,0.134
+101800100102,Nunn Creek,1783,0.0,-2.012,0.129
+101900070502,Panhandle Creek-North Fork Cache La Poudre River,1781,0.0,-2.045,0.119
+101900070602,North Fork Lone Pine Creek,2681,0.0,-2.101,0.106
+101800100202,Running Water Creek-Sand Creek,267,0.0,-2.341,0.104
+101800100105,Stub Creek-Laramie River,105,0.0,-2.575,0.092

@@ -1,0 +1,4 @@
+region,P(rank 1),P(rank 2),P(rank 3),mean_score,score_p05,score_p95
+poudre,0.472,0.395,0.133,0.857,0.041,1.441
+black_hills,0.138,0.251,0.611,0.383,-0.367,1.134
+front_range,0.39,0.354,0.256,0.768,0.205,1.38

@@ -1,0 +1,161 @@
+# daear-earth-intelligence
+#
+# One environment covering all five demo repos:
+#     wildfire-landscape-intelligence
+#     soil-watershed-intelligence
+#     climate-resilience-indicators
+#     tribal-wildfire-intelligence
+#     earth-intelligence-toolkit (daear_toolkit itself)
+#
+#     conda env create -f environment.yaml
+#     conda activate daear
+#     python -m ipykernel install --user --name daear --display-name "Python (daear)"
+#
+# Mamba is strongly recommended over conda for this one because the geospatial stack
+# (GDAL, PROJ, GEOS) has a large solve space and conda's classic solver can take
+# 20+ minutes on it:
+#
+#     mamba env create -f environment.yaml
+#
+# READ THE NOTES AT THE BOTTOM. Two sections are inferred rather than verified,
+# and one of them is the Sentinel-2 stack that half these notebooks depend on.
+
+name: daear
+
+channels:
+  # conda-forge only. Mixing defaults with conda-forge is the usual cause of
+  # GDAL/PROJ ABI breakage in geospatial environments rasterio and geopandas
+  # get linked against different libgdal builds and fail at import with errors
+  # that point nowhere useful. `nodefaults` makes that impossible rather than
+  # merely unlikely.
+  - conda-forge
+  - nodefaults
+
+dependencies:
+  # Interpreter
+  # 3.10 is the hard floor: the toolkit uses PEP 604 unions (`float | None`) in
+  # runtime annotations, not just in `from __future__` guarded blocks.
+  # 3.12 is what the test suites were actually run against.
+  - python=3.12
+
+  # Core scientific stack
+  - numpy>=1.24
+  - pandas>=2.0            # `reset_index(names=...)` in tribal_indicators
+  - scipy>=1.11            # `stats.false_discovery_control` (BH correction,
+                           #  climate Module 1); added in 1.11
+  - xarray>=2023.1
+  - matplotlib-base>=3.7   # -base avoids pulling PyQt for a headless install
+
+  # Geospatial
+  # Let the solver pick libgdal/PROJ/GEOS. Pinning them by hand is how these
+  # environments break.
+  - geopandas>=1.0         # `gpd.clip`, `gpd.sjoin`, `gpd.overlay`
+  - shapely>=2.0           # 2.x API; 1.8 will not work
+  - rasterio>=1.3          # `features.rasterize`, `features.geometry_mask`,
+                           #  `transform.from_bounds`
+  - rioxarray>=0.15        # LANDFIRE GeoTIFF reads in fire_access
+  - pyproj>=3.5
+  - fiona>=1.9             # geopandas vector I/O backend
+
+  # Array I/O and parallelism
+  # netcdf4 is required: it is both the `.to_netcdf()` backend for
+  # the cross-module handoffs (severity - recovery - risk) AND the OPeNDAP
+  # client for gridMET and MACAv2. The conda-forge build has DAP support
+  # compiled in; some pip wheels do not, which fails only at the remote-read
+  # step with a confusing error.
+  - netcdf4>=1.6
+  - h5netcdf>=1.1          # fallback engine; useful when a netcdf4 read chokes
+  - h5py>=3.8              # SMAP HDF5 granules (climate_access.get_soil_moisture)
+  - dask>=2023.5           # `apply_ufunc(dask="parallelized")` in trend_map
+  - bottleneck             # large speedup for xarray rolling/reduction ops
+
+  # Remote data access
+  - requests>=2.31         # ArcGIS REST, Overpass, FIRMS, NWIS, AWDB
+  - earthaccess>=0.9       # NASA Earthdata auth + SMAP granule search/download
+  - pystac-client>=0.7     # STAC search - see NOTE 1
+  - odc-stac>=0.3          # STAC items - xarray - see NOTE 1
+  - planetary-computer>=1.0  # PC asset signing -see NOTE 1
+
+  # Notebook environment
+  - jupyterlab>=4.0
+  - ipykernel
+  - nbformat>=5.9          # used by the notebook build scripts
+  - tqdm                   # progress on the long FOD / MACA downloads
+
+  # Development
+  - pytest>=7.4
+  - nbval                  # runs notebooks as tests; see NOTE 4
+  - ruff
+
+  # pip-only
+  - pip
+  - pip:
+      # Editable install of the toolkit itself. Adjust the path to wherever
+      # earth-intelligence-toolkit sits relative to this file.
+      - -e ../earth-intelligence-toolkit
+
+# NOTES
+# NOTE 1 - THE STAC BLOCK IS INFERRED.
+#   pystac-client + odc-stac +
+#   planetary-computer is the most common combination, but if data_access
+#   actually uses one of these instead, swap it in and drop the three above:
+#
+#       - stackstac              # alternative STAC -> xarray
+#       - sentinelhub            # Sentinel Hub API
+#       - google-cloud-storage   # if pulling COGs from GCS
+#       - earthengine-api        # if it wraps GEE (would also need geemap)
+#
+#   Same caveat for `get_soil_properties` (SSURGO/SoilGrids) and
+#   `get_burn_severity` (MTBS rasters). If those use anything beyond requests +
+#   rasterio, it is missing here.
+#
+#   Fastest way to resolve: `head -40 earth-intelligence-toolkit/daear_toolkit/data_access.py`
+#   and reconcile the imports against this file.
+#
+# NOTE 2 - DELIBERATELY ABSENT: pysheds, richdem.
+#   `daear_toolkit.hydrology` implements priority-flood depression filling, D8
+#   routing, and flow accumulation in pure NumPy/SciPy specifically so these
+#   repos do not take a GDAL/Cython build-chain dependency. Both libraries are
+#   better than what I wrote for production hydrology work; neither is needed to
+#   run these notebooks. Add them only if you outgrow the pure-NumPy version.
+#
+# NOTE 3 - API KEYS AND CREDENTIALS.
+#   Set these before running the affected notebooks:
+#
+#     FIRMS_MAP_KEY        wildfire Module 2 (VIIRS active fire)
+#                          free: https://firms.modaps.eosdis.nasa.gov/api/
+#     Earthdata login      climate Module 4 (SMAP)
+#                          `earthaccess.login()` once writes ~/.netrc, or set
+#                          EARTHDATA_USERNAME / EARTHDATA_PASSWORD
+#     DAEAR_CACHE          optional; defaults to ./data/*_cache per module.
+#                          Point it somewhere with room - the FOD SQLite
+#                          archive alone is ~700 MB and the gridMET caches are
+#                          several GB across three regions.
+#
+# NOTE 4 - nbval will fail on these notebooks as written, by design.
+#   Every notebook hits live services, and several need credentials. nbval is
+#   here for the toolkit test scripts and for whenever we add smoke tests with
+#   recorded fixtures. The unit tests that actually run offline are:
+#
+#     test_hydrology.py            test_climate_indicators.py
+#     test_fire_indicators.py      test_sovereignty.py
+#
+#   Run them first after any env rebuild 
+#   they exercise the math without touching the network.
+#
+# NOTE 5 - PANDAS 3.
+#   The test suites were run against pandas 3.x. There is no upper pin here, but
+#   be aware that pandas 3 gives string columns a dedicated `str` dtype rather
+#   than `object`, which already caused one real bug in
+#   `sovereignty.CulturalResourceGuard` (a dtype check silently skipped string
+#   columns, so the guard failed *open*). If you pin pandas back below 3.0 for
+#   another reason, re-run test_sovereignty.py as that guard is the one piece of
+#   this codebase where a silent pass is worse than a crash.
+#
+# NOTE 6 - LOCK THE ENVIRONMENT BEFORE A DEMO.
+#   This file has floors, not pins, so it will solve differently in three
+#   months. Before anything you present:
+#
+#       conda env export --no-builds > environment.lock.yaml
+#
+#   Commit the lock alongside this file. 

@@ -7,3 +7,25 @@ dist/
 .pytest_cache/
 .DS_Store
 *.zarr/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Downloaded datasets and caches
+**/smap_cache/
+**/cache/
+**/tmp/

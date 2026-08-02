@@ -1,0 +1,5 @@
+when,tier,dataset,action,result
+2026-08-02T11:36:45,PUBLIC,mtbs,demonstrate,PERMITTED
+2026-08-02T11:36:45,PARTNER,mtbs,demonstrate,DENIED
+2026-08-02T11:36:45,COMMUNITY,mtbs,demonstrate,DENIED
+2026-08-02T11:36:45,RESTRICTED,mtbs,demonstrate,DENIED

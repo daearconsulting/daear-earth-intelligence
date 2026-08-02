@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 """
 daear_toolkit
-=============
 Shared Earth observation, indicator, cube-building, governance, and
 visualization utilities used across the Daear Consulting demo repo portfolio:
 
@@ -9,7 +10,7 @@ visualization utilities used across the Daear Consulting demo repo portfolio:
     tribal-wildfire-intelligence
     climate-resilience-indicators
 
-See README.md for the honest status of live-data vs. synthetic-demo mode.
+See README.md for the status of live-data vs. synthetic-demo mode.
 """
 
 from . import data_access

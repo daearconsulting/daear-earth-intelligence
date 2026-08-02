@@ -1,0 +1,15 @@
+   102372       0       0      36836  ?              0 15:16:56 C:\Program Files\Git\mingw64\bin\git.exe
+    72004       0       0       6468  ?              0 15:52:49 C:\Users\gekek\AppData\Local\Programs\Microsoft VS Code\Code.exe
+   100088       0       0      34552  ?              0 15:52:51 C:\Users\gekek\AppData\Local\Programs\Microsoft VS Code\Code.exe
+   104396       0       0      38860  ?              0 15:52:51 C:\Users\gekek\AppData\Local\Programs\Microsoft VS Code\Code.exe
+    70692       0       0       5156  ?              0 15:52:51 C:\Users\gekek\AppData\Local\Programs\Microsoft VS Code\Code.exe
+    76124       0       0      10588  ?              0 15:52:51 C:\Users\gekek\AppData\Local\Programs\Microsoft VS Code\Code.exe
+    84072       0       0      18536  ?              0 15:52:52 C:\Users\gekek\AppData\Local\Programs\Microsoft VS Code\Code.exe
+   102408       0       0      36872  ?              0 15:52:52 C:\Users\gekek\AppData\Local\Programs\Microsoft VS Code\Code.exe
+   102692       0       0      37156  ?              0 15:52:52 C:\Users\gekek\AppData\Local\Programs\Microsoft VS Code\Code.exe
+    90212       0       0      24676  ?              0 15:52:52 C:\Users\gekek\AppData\Local\Programs\Microsoft VS Code\Code.exe
+    92236       0       0      26700  ?              0 15:52:53 C:\Users\gekek\AppData\Local\Programs\Microsoft VS Code\e4c7e7b1d6\resources\app\node_modules.asar.unpacked\node-pty\build\Release\conpty\OpenConsole.exe
+   101732       0       0      36196  ?              0 15:52:53 C:\Users\gekek\AppData\Local\Programs\Microsoft VS Code\e4c7e7b1d6\resources\app\node_modules.asar.unpacked\node-pty\build\Release\conpty\OpenConsole.exe
+    99072       0       0      33536  ?              0 15:52:53 C:\Program Files\Git\bin\bash.exe
+   105012       0       0      39476  ?              0 15:52:59 C:\Users\gekek\AppData\Local\Programs\Microsoft VS Code\e4c7e7b1d6\resources\app\node_modules.asar.unpacked\node-pty\build\Release\conpty\OpenConsole.exe
+   104888       0       0      39352  ?              0 15:52:59 C:\Program Files\Git\bin\bash.exe

@@ -1,15 +1,15 @@
+from __future__ import annotations
+
 """
-Shared plotting style -- every repo's figures should look like one product
+Shared plotting style every repo's figures should look like one product
 line. Keep this file small and dependency-light (matplotlib only) so it's
 easy to drop into any notebook.
 """
 
-from __future__ import annotations
-
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 
-# Daear brand palette (matches the CV / one-pager accent color)
+# Daear brand palette (matches the CV/one-pager accent color)
 ACCENT = "#1F4E3D"       # deep evergreen
 ACCENT_LIGHT = "#6B9080"
 WARN = "#B45309"         # burn/erosion warning tone

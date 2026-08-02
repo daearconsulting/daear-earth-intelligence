@@ -1,13 +1,10 @@
+from dataclasses import dataclass
+
 """
 Shared demo region definitions.
 
-All four downstream repos import POUDRE_CAMERON_PEAK so the portfolio
-demonstrates one continuous story about one real place, rather than four
-disconnected toy examples.
+All four downstream repos import POUDRE_CAMERON_PEAK.
 """
-
-from dataclasses import dataclass
-
 
 @dataclass(frozen=True)
 class Region:
@@ -16,7 +13,7 @@ class Region:
     bbox: tuple  # (min_lon, min_lat, max_lon, max_lat), WGS84
     fire_name: str
     fire_year: int
-    fire_acres: int  # verified: en.wikipedia.org/wiki/Cameron_Peak_fire (accessed 2026-07)
+    fire_acres: int  
     fire_start: str
     fire_contained: str
     watershed: str

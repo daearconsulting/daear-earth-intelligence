@@ -1,0 +1,4 @@
+region,name,spei_trend,spei_p,vpd_days_trend,vpd_days_p,erc_days_trend,erc_days_p,peak_swe_trend,peak_swe_p,meltout_trend,meltout_p,low_flow_trend,low_flow_p
+poudre,Cache la Poudre/Cameron Peak,-0.1029,0.213,2.1429,0.0024,15.0,0.0005,-1.2709,0.0247,-8.125,0.03,-0.0278,0.8423
+black_hills,Black Hills (He Sapa),-0.1114,0.3937,3.3333,0.1357,14.2857,0.0176,-0.9028,0.0408,-0.7512,0.7331,1.8451,0.0608
+front_range,Upper South Platte / Front Range foothills,-0.0931,0.2074,3.3333,0.0017,15.0,0.0003,0.2925,0.6985,-7.1237,0.2151,-2.1029,0.0035

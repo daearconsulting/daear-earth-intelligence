@@ -1,0 +1,9 @@
+component,score,source,description,weight,contribution
+tribal_fire_program_capacity,0.7,FABRICATED structural example only,"Staffing, equipment, and qualifications held by the Nation's own fire program",0.167,0.1167
+mutual_aid_agreements,0.55,FABRICATED structural example only,"Pre-negotiated agreements with adjacent jurisdictions, reducing authorization delay",0.111,0.0611
+land_based_knowledge,0.9,FABRICATED structural example only,"Active knowledge of fire behaviour, fuels, and terrain held in the community",0.167,0.15
+cultural_burning_practice,0.45,FABRICATED structural example only,Existing or revivable cultural burning practice and the authority to exercise it,0.111,0.05
+kinship_response_networks,0.88,FABRICATED structural example only,Informal networks that mobilize evacuation and sheltering faster than agencies,0.167,0.1467
+governance_continuity,0.75,FABRICATED structural example only,Stable Tribal emergency management authority and continuity of program staff,0.111,0.0833
+communications_reach,0.5,FABRICATED structural example only,"Ability to reach households quickly, including where cell coverage is absent",0.111,0.0556
+youth_workforce_pipeline,0.6,FABRICATED structural example only,Local pathways into fire and natural-resource careers,0.056,0.0333

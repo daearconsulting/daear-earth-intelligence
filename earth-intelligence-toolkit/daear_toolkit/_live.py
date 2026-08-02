@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Live (network-backed) implementations of the data_access.get_* functions.
 
@@ -13,28 +15,27 @@ CONFIDENCE NOTES (read before relying on this in a deadline-critical run):
   collection/asset names below (sentinel-2-l2a, cop-dem-glo30, B04/B08/B11)
   are standard as of this build.
 - FIRMS active-fire API: high confidence. The URL pattern is stable and
-  documented at https://firms.modaps.eosdis.nasa.gov/api/ -- you need a
+  documented at https://firms.modaps.eosdis.nasa.gov/api/ you need a
   free MAP_KEY from https://firms.modaps.eosdis.nasa.gov/api/map_key/.
 - MTBS direct download: MEDIUM confidence. MTBS does not have a clean
   queryable REST API for individual fire perimeters/severity the way FIRMS
-  and Planetary Computer do -- their site has changed structure over the
+  and Planetary Computer do as their site has changed structure over the
   years. `mtbs_burn_severity_from_direct_download()` below takes a fire-
   specific download URL as an argument rather than guessing one, because I
-  can't verify the current exact URL from this sandbox. Get the right URL
-  by finding "Cameron Peak" at https://mtbs.gov/direct-download and copying
-  the dNBR/severity GeoTIFF link. `burn_severity_from_sentinel2()` is the
-  no-MTBS-dependency alternative: it computes dNBR directly from two real
+  can't verify the current exact URL. TODO: Get the right URL by finding "Cameron Peak" 
+  at https://mtbs.gov/direct-download and copying the dNBR/severity GeoTIFF link. 
+  `burn_severity_from_sentinel2()` is the no-MTBS-dependency alternative: it 
+  computes dNBR directly from two real
   Sentinel-2 scenes using daear_toolkit.indicators.dnbr, which only depends
   on the high-confidence Sentinel-2 path above.
 - SSURGO via USDA Soil Data Access (SDA): MEDIUM confidence. The Tabular
   service endpoint and JSON request shape below match SDA's documented
   usage, but the exact spatial-intersection SQL function name has changed
-  between SDA versions -- verify `SDA_Get_Mukey_from_intersection_with_WktWgs84`
+  between SDA versions so verify `SDA_Get_Mukey_from_intersection_with_WktWgs84`
   against current docs at https://sdmdataaccess.nrcs.usda.gov if the query
   fails, and adjust the function name/signature as needed.
 """
 
-from __future__ import annotations
 
 import os
 import numpy as np
@@ -56,16 +57,14 @@ def _require(*packages):
         )
 
 
-# ---------------------------------------------------------------------------
-# Sentinel-2 (Microsoft Planetary Computer) -- HIGH confidence
-# ---------------------------------------------------------------------------
+# Sentinel-2 (Microsoft Planetary Computer) HIGH confidence
 
 def sentinel2_scene(bbox: tuple, date: str, cloud_cover_lt: int = 20, days_window: int = 15) -> xr.Dataset:
     """
     Real Sentinel-2 L2A surface reflectance scene (red/nir/swir16) nearest
     `date` over `bbox`, via Planetary Computer's public STAC catalog.
 
-    No credentials required for search or read -- Planetary Computer signs
+    No credentials required for search or read as Planetary Computer signs
     asset URLs with a short-lived SAS token automatically via
     `planetary_computer.sign_inplace`.
     """
@@ -126,20 +125,18 @@ def sentinel2_scene(bbox: tuple, date: str, cloud_cover_lt: int = 20, days_windo
     return ds
 
 
-# ---------------------------------------------------------------------------
-# Burn severity -- MEDIUM confidence (MTBS) + HIGH confidence fallback
-# ---------------------------------------------------------------------------
+# Burn severity: MEDIUM confidence (MTBS) and HIGH confidence fallback
 
 def mtbs_burn_severity_from_direct_download(geotiff_url: str, bbox: tuple) -> xr.DataArray:
     """
-    Load an MTBS dNBR/burn-severity GeoTIFF you've already located via
+    Load an MTBS dNBR/burn-severity GeoTIFF located via
     https://mtbs.gov/direct-download (search "Cameron Peak"), clipped to
     bbox. Pass the direct GeoTIFF URL you copied from that page.
 
     MTBS severity classes are typically coded 1 (unburned) - 5 (high) or
     higher; this rescales to 0-1 for consistency with the rest of the
     toolkit. Check the specific product's legend before trusting the
-    rescaling blindly -- MTBS product schemas have varied by release.
+    rescaling blindly as MTBS product schemas have varied by release.
     """
     _require("rioxarray")
     import rioxarray
@@ -148,7 +145,7 @@ def mtbs_burn_severity_from_direct_download(geotiff_url: str, bbox: tuple) -> xr
     da = da.rio.clip_box(minx=bbox[0], miny=bbox[1], maxx=bbox[2], maxy=bbox[3])
     da = da.rename({"x": "lon", "y": "lat"})
 
-    valid = da.where(da > 0)  # MTBS commonly uses 0 for "outside fire perimeter / no data"
+    valid = da.where(da > 0)  # MTBS commonly uses 0 for "outside fire perimeter/no data"
     rescaled = (valid - valid.min()) / (valid.max() - valid.min() + 1e-9)
     rescaled.name = "burn_severity"
     rescaled.attrs.update(source="MTBS direct download", url=geotiff_url, synthetic=False)
@@ -159,7 +156,7 @@ def burn_severity_from_sentinel2(bbox: tuple, pre_fire_date: str, post_fire_date
     """
     No-MTBS-dependency alternative: real dNBR computed directly from two
     real Sentinel-2 scenes via daear_toolkit.indicators.dnbr. Only depends
-    on the high-confidence sentinel2_scene() path above -- use this if the
+    on the high-confidence sentinel2_scene() path above use this if the
     MTBS URL in mtbs_burn_severity_from_direct_download() doesn't resolve.
     """
     from . import indicators  # local import to avoid a package-level cycle
@@ -171,9 +168,7 @@ def burn_severity_from_sentinel2(bbox: tuple, pre_fire_date: str, post_fire_date
     return da
 
 
-# ---------------------------------------------------------------------------
-# FIRMS active fire detections -- HIGH confidence
-# ---------------------------------------------------------------------------
+# FIRMS active fire detections: HIGH confidence
 
 def firms_fire_detections(bbox: tuple, start_date: str, end_date: str, source: str = "VIIRS_SNPP_NRT"):
     """
@@ -228,9 +223,7 @@ def firms_fire_detections(bbox: tuple, start_date: str, end_date: str, source: s
     return df.loc[mask].reset_index(drop=True)
 
 
-# ---------------------------------------------------------------------------
-# Terrain (Copernicus DEM via Planetary Computer) -- HIGH confidence
-# ---------------------------------------------------------------------------
+# Terrain (Copernicus DEM via Planetary Computer): HIGH confidence
 
 def copernicus_dem(bbox: tuple) -> xr.Dataset:
     """Real 30m Copernicus DEM elevation + derived slope, via Planetary Computer."""
@@ -269,9 +262,7 @@ def copernicus_dem(bbox: tuple) -> xr.Dataset:
     return ds
 
 
-# ---------------------------------------------------------------------------
-# Soil (USDA Soil Data Access) -- MEDIUM confidence
-# ---------------------------------------------------------------------------
+# Soil (USDA Soil Data Access): MEDIUM confidence
 
 def ssurgo_soil_properties(bbox: tuple) -> "pandas.DataFrame":  # noqa: F821
     """
@@ -280,14 +271,14 @@ def ssurgo_soil_properties(bbox: tuple) -> "pandas.DataFrame":  # noqa: F821
     Tabular REST service.
 
     Returns a per-map-unit DataFrame (SSURGO is polygon/map-unit data, not
-    a regular raster grid) -- rasterizing onto the toolkit's lat/lon grid
+    a regular raster grid) rasterizing onto the toolkit's lat/lon grid
     for direct use in indicators.soil_vulnerability() is a follow-up step
-    (e.g. geopandas + rasterio rasterize), not included here since it needs
+    (ex. geopandas and rasterio rasterize), not included here since it needs
     the actual map unit geometries alongside the attribute table this
     function returns.
 
     Verify the spatial-intersection SQL function name against current SDA
-    docs (https://sdmdataaccess.nrcs.usda.gov) if this returns an error --
+    docs (https://sdmdataaccess.nrcs.usda.gov) if this returns an error,
     SDA's exact function names have changed between versions.
     """
     _require("requests")
@@ -323,7 +314,7 @@ def ssurgo_soil_properties(bbox: tuple) -> "pandas.DataFrame":  # noqa: F821
     table = payload.get("Table")
     if not table:
         raise RuntimeError(
-            "SDA query returned no rows -- verify the SQL function name "
+            "SDA query returned no rows: verify the SQL function name "
             "against current Soil Data Access docs and retry."
         )
     columns, *rows = table

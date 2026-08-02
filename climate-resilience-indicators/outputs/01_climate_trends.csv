@@ -1,0 +1,16 @@
+region,variable,trend_per_decade,ci_lo,ci_hi,p_raw,p_corrected,var_inflation,significant
+poudre,tmax_c,0.2855,0.0377,0.542,0.0289,0.0289,1.0,True
+poudre,tmin_c,0.4057,0.1623,0.6057,0.0,0.0,1.0,True
+poudre,precip_mm,-9.7245,-41.4646,23.809,0.5253,0.5253,1.0,False
+poudre,vpd_kpa,0.0424,0.0199,0.0608,0.0018,0.0018,1.0,True
+poudre,vpd_summer,0.0624,0.0138,0.127,0.0116,0.0116,1.0,True
+black_hills,tmax_c,0.281,-0.2129,0.6681,0.2328,0.2328,1.0,False
+black_hills,tmin_c,0.3035,-0.0621,0.6613,0.08,0.08,1.0,False
+black_hills,precip_mm,4.6703,-40.6977,41.445,0.7685,0.7685,1.0,False
+black_hills,vpd_kpa,0.0334,0.0004,0.0724,0.0456,0.0456,1.0,True
+black_hills,vpd_summer,0.0811,-0.0197,0.1866,0.08,0.08,1.0,False
+front_range,tmax_c,0.191,-0.0651,0.4293,0.0973,0.0973,1.0,False
+front_range,tmin_c,0.4611,0.2794,0.6707,0.0,0.0,1.0,True
+front_range,precip_mm,-4.914,-32.6585,23.3376,0.7449,0.7449,1.0,False
+front_range,vpd_kpa,0.0418,0.0181,0.0617,0.0015,0.0015,1.0,True
+front_range,vpd_summer,0.0578,0.0031,0.1248,0.0424,0.0424,1.0,True
