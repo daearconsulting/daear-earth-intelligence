@@ -7,6 +7,12 @@ dist/
 .pytest_cache/
 .DS_Store
 *.zarr/
+# Climate data caches
+**/climate_cache/
+**/smap_cache/
+
+# Large downloaded datasets
+**/data/
 
 # Python
 __pycache__/
