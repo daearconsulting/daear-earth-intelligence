@@ -45,15 +45,12 @@ Every notebook runs top-to-bottom with no credentials required.
 
 ## Next steps
 
-1. Get `earthaccess`/Planetary Computer credentials and flip `synthetic=False`
-   for at least one region/date to replace synthetic data with a real
-   Cameron Peak scene
-2. Fill in the scaffolded modules in `soil-watershed-intelligence`,
+1. Fill in the scaffolded modules in `soil-watershed-intelligence`,
    `tribal-wildfire-intelligence`, and `climate-resilience-indicators` 
    each README lists exactly what's planned
-3. Replace the illustrative grid-based "sub-watershed" split in
+2. Replace the illustrative grid-based "sub-watershed" split in
    `wildfire-landscape-intelligence` Module 4 with real NHD/WBD HUC-12
    polygons
-4. Extend `climate-resilience-indicators` to the Black Hills and a Tribal
+3. Extend `climate-resilience-indicators` to the Black Hills and a Tribal
    watershed region (new `Region` entries in
    `earth_intelligence_toolkit.regions` no new code needed)
