@@ -43,7 +43,7 @@ cd ../wildfire-landscape-intelligence && jupyter lab notebooks/
 
 Every notebook runs top-to-bottom with no credentials required.
 
-## Next steps toward a real demo
+## Next steps
 
 1. Get `earthaccess`/Planetary Computer credentials and flip `synthetic=False`
    for at least one region/date to replace synthetic data with a real
