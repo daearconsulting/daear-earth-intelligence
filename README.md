@@ -1,5 +1,7 @@
 # Daear Consulting Earth Intelligence Platform
 
+[![DOI](https://zenodo.org/badge/1311342213.svg)](https://doi.org/10.5281/zenodo.21783267)
+
 ```
 Daear-Consulting/
 ├── earth-intelligence-toolkit        # shared library for data access, indicators, cube, governance, viz
